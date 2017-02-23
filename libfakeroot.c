@@ -818,7 +818,8 @@ int chown(const char *path, uid_t owner, gid_t group){
     r=0;
   if(r&&(errno==EPERM))
     r=0;
-
+  if(r&&(errno==EINVAL))
+    r=0;
   return r;
 }
 
@@ -845,7 +846,8 @@ int lchown(const char *path, uid_t owner, gid_t group){
     r=0;
   if(r&&(errno==EPERM))
     r=0;
-
+  if(r&&(errno==EINVAL))
+    r=0;
   return r;
 }
 #endif
@@ -869,7 +871,8 @@ int fchown(int fd, uid_t owner, gid_t group){
 
   if(r&&(errno==EPERM))
     r=0;
-
+  if(r&&(errno==EINVAL))
+    r=0;
   return r;
 }
 
@@ -896,7 +899,8 @@ int fchownat(int dir_fd, const char *path, uid_t owner, gid_t group, int flags) 
 
   if(r&&(errno==EPERM))
     r=0;
-
+  if(r&&(errno==EINVAL))
+    r=0;
   return r;
 }
 #endif /* HAVE_FCHOWNAT */
