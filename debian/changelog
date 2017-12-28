@@ -1,3 +1,10 @@
+sandboxer-fakeroot (1.22-1) unstable; urgency=low
+
+  * Helper package for use with sandboxer suite (https://github.com/DarkCaster/Sandboxer)
+    based on fakeroot package, contain minor modifications for use with user namespaces
+
+ -- DarkCaster <dark.caster@outlook.com>  Wed, 27 Dec 2017 00:00:00 +0000
+
 fakeroot (1.22-1) unstable; urgency=medium
 
   * New upstream version.
