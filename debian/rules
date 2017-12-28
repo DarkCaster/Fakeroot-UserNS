@@ -11,7 +11,7 @@ endif
 LIB_DIR	 = usr/lib/$(DEB_HOST_MULTIARCH)
 
 TARGET_PREFIX=/usr/lib/sandboxer
-PACKAGE=sandboxer
+PACKAGE=$(shell dpkg-parsechangelog --show-field Source)
 TARGET_INSTALL_PREFIX=debian/$(PACKAGE)$(TARGET_PREFIX)
 
 %:
