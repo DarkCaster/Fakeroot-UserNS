@@ -29,7 +29,7 @@ cd "$target"
 mv "sandboxer-fakeroot" "sandboxer-fakeroot_$version.orig"
 rm -f "sandboxer-fakeroot_$version.orig.tar.xz"
 rm -f "sandboxer-fakeroot_$version.orig.tar"
-tar cf "sandboxer-fakeroot_$version.orig.tar" "sandboxer-fakeroot_$version.orig"
+tar cf "sandboxer-fakeroot_$version.orig.tar" "sandboxer-fakeroot_$version.orig" --owner=0 --group=0
 xz -9e "sandboxer-fakeroot_$version.orig.tar"
 
 cd "sandboxer-fakeroot_$version.orig"
