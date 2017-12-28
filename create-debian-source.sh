@@ -34,9 +34,9 @@ xz -9e "sandboxer-fakeroot_$version.orig.tar"
 
 cd "sandboxer-fakeroot_$version.orig"
 if [[ -z $key ]]; then
-  dpkg-buildpackage -d -S -us -uc
+  dpkg-buildpackage -d -S -sa -us -uc
 else
-  dpkg-buildpackage -d -S -k$key
+  dpkg-buildpackage -d -S -sa -k$key
 fi
 
 cd "$target"
