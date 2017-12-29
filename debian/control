@@ -9,7 +9,7 @@ Homepage: https://github.com/DarkCaster/Fakeroot-UserNS
 Package: sandboxer-fakeroot
 Architecture: any
 Multi-Arch: foreign
-Depends: libfakeroot (>= ${binary:Version}), ${misc:Depends}, ${shlibs:Depends}
+Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: tool for simulating superuser privileges
  fakeroot provides a fake "root environment" by means of LD_PRELOAD and
  SysV IPC (or TCP) trickery. It puts wrappers around getuid(), chown(),
