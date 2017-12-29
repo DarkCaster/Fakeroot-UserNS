@@ -26,13 +26,17 @@ sed -i "s|__VERSION__SUFFIX__|""$version""|g" "debian/changelog"
 version=`dpkg-parsechangelog --show-field Version | cut -f1 -d"-"`
 
 cd "$target"
-mv "sandboxer-fakeroot" "sandboxer-fakeroot_$version.orig"
-rm -f "sandboxer-fakeroot_$version.orig.tar.xz"
-rm -f "sandboxer-fakeroot_$version.orig.tar"
-tar cf "sandboxer-fakeroot_$version.orig.tar" "sandboxer-fakeroot_$version.orig" --owner=0 --group=0
-xz -9e "sandboxer-fakeroot_$version.orig.tar"
+if [[ ! -f sandboxer-fakeroot_$version.orig.tar.xz ]]; then
+  cp -r "sandboxer-fakeroot" "sandboxer-fakeroot_$version.orig"
+  rm -rf "sandboxer-fakeroot_$version.orig/debian"
+  rm -f "sandboxer-fakeroot_$version.orig.tar.xz"
+  rm -f "sandboxer-fakeroot_$version.orig.tar"
+  tar cf "sandboxer-fakeroot_$version.orig.tar" "sandboxer-fakeroot_$version.orig" --owner=0 --group=0
+  xz -9e "sandboxer-fakeroot_$version.orig.tar"
+  rm -rf "sandboxer-fakeroot_$version.orig"
+fi
 
-cd "sandboxer-fakeroot_$version.orig"
+cd "sandboxer-fakeroot"
 if [[ -z $key ]]; then
   dpkg-buildpackage -d -S -sa -us -uc
 else
@@ -40,4 +44,4 @@ else
 fi
 
 cd "$target"
-rm -rf "sandboxer-fakeroot_$version.orig"
+rm -rf "sandboxer-fakeroot"
