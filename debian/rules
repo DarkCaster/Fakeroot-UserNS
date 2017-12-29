@@ -1,5 +1,6 @@
 #!/usr/bin/make -f
-
+export QUILT_PATCHES=debian/patches
+export QUILT_REFRESH_ARGS="-p ab --no-timestamps --no-index"
 export DH_VERBOSE = 1
 
 DEB_BUILD_GNU_TYPE = $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
@@ -18,6 +19,7 @@ TARGET_INSTALL_PREFIX=debian/$(PACKAGE)$(TARGET_PREFIX)
 	dh $@
 
 dhar-stamp:
+	quilt push -a
 	dh_autoreconf
 	(cd doc && po4a -k 0 --rm-backups --variable "srcdir=../doc/" po4a/po4a.cfg) || exit 1
 	touch $@
@@ -39,3 +41,4 @@ override_dh_auto_clean:
 	rm -rf obj-tcp
 	dh_autoreconf_clean
 	rm -f dhar-stamp
+	quilt pop -a || true

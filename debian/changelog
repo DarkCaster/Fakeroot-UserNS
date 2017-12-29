@@ -1,4 +1,4 @@
-sandboxer-fakeroot (1.22-1__VERSION__SUFFIX__) __DISTRO__; urgency=low
+sandboxer-fakeroot (1.22.1__VERSION__SUFFIX__) __DISTRO__; urgency=low
 
   * Helper package for use with sandboxer suite (https://github.com/DarkCaster/Sandboxer)
     based on fakeroot package, contain minor modifications for use with user namespaces

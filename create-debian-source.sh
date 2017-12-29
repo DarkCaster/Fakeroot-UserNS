@@ -16,31 +16,17 @@ distro="$4"
 [[ $distro = none ]] && distro=""
 
 mkdir -p "$target/sandboxer-fakeroot"
-
 git archive --format tar HEAD | (cd "$target/sandboxer-fakeroot" && tar xf -)
 
 cd "$target/sandboxer-fakeroot"
 [[ -z $distro ]] && sed -i "s|__DISTRO__|unstable|g" "debian/changelog"
 [[ ! -z $distro ]] && sed -i "s|__DISTRO__|""$distro""|g" "debian/changelog"
 sed -i "s|__VERSION__SUFFIX__|""$version""|g" "debian/changelog"
-version=`dpkg-parsechangelog --show-field Version | cut -f1 -d"-"`
 
-cd "$target"
-if [[ ! -f sandboxer-fakeroot_$version.orig.tar.xz ]]; then
-  cp -r "sandboxer-fakeroot" "sandboxer-fakeroot_$version.orig"
-  rm -rf "sandboxer-fakeroot_$version.orig/debian"
-  rm -f "sandboxer-fakeroot_$version.orig.tar.xz"
-  rm -f "sandboxer-fakeroot_$version.orig.tar"
-  tar cf "sandboxer-fakeroot_$version.orig.tar" "sandboxer-fakeroot_$version.orig" --owner=0 --group=0
-  xz -9e "sandboxer-fakeroot_$version.orig.tar"
-  rm -rf "sandboxer-fakeroot_$version.orig"
-fi
-
-cd "sandboxer-fakeroot"
 if [[ -z $key ]]; then
-  dpkg-buildpackage -d -S -sa -us -uc
+  dpkg-buildpackage -d -S -us -uc
 else
-  dpkg-buildpackage -d -S -sa -k$key
+  dpkg-buildpackage -d -S -k$key
 fi
 
 cd "$target"
