@@ -29,5 +29,5 @@ else
   dpkg-buildpackage -d -S -k$key
 fi
 
-cd "$target"
+cd ..
 rm -rf "sandboxer-fakeroot"
