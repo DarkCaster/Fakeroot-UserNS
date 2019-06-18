@@ -1463,6 +1463,8 @@ int main(int argc, char **argv){
     case SIGKILL:
     case SIGTSTP:
     case SIGCONT:
+    case SIGCHLD:
+    case SIGINFO:
     case SIGWINCH:
       break;
     case SIGUSR1:
