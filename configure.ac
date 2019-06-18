@@ -283,7 +283,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
        acl_t t;
   ]])],[AC_DEFINE_UNQUOTED(HAVE_ACL_T,1)
    AC_MSG_RESULT([yes])
-  ],[ AC_MSG_RESULT([no])
+  ],[ AC_MSG_ERROR(cannot find sys/acl.h or sys/types.h header, check libacl1-dev package is installed)
   ])
 
 AC_CHECK_FUNCS(fchmodat fchownat fstatat mkdirat mknodat openat renameat unlinkat lchmod fgetattrlist)
