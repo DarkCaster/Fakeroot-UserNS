@@ -1464,7 +1464,6 @@ int main(int argc, char **argv){
     case SIGTSTP:
     case SIGCONT:
     case SIGCHLD:
-    case SIGINFO:
     case SIGWINCH:
       break;
     case SIGUSR1:
