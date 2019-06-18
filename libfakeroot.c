@@ -1582,12 +1582,12 @@ static size_t common_setxattr(INT_STRUCT_STAT *st, const char *name, void * valu
   xattr.size = size;
   xattr.flags = flags;
   xattr.func = setxattr_func;
-  /*INT_SEND_GET_XATTR(st, &xattr);
+  INT_SEND_GET_XATTR(st, &xattr);
   if (xattr.rc)
   {
     errno = xattr.rc;
     return -1;
-  }*/
+  }
   return 0;
 }
 #endif /* defined(HAVE_SETXATTR) || defined(HAVE_LSETXATTR) || defined(HAVE_FSETXATTR) */
