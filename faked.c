@@ -1321,7 +1321,6 @@ int main(int argc, char **argv){
   }
 
   while(*(++argv)){
-    debug=1;
     if(!strcmp(*argv,"--key"))
 #ifndef FAKEROOT_FAKENET
       msg_key=read_intarg(++argv);
