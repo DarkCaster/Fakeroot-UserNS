@@ -3,7 +3,7 @@ Section: utils
 Priority: optional
 Build-Depends: build-essential, quilt, debhelper (>= 9), dh-autoreconf, libacl1-dev, libcap-dev [linux-any], libcap2-bin [linux-any], po4a, sharutils
 Maintainer: DarkCaster <dark.caster@outlook.com>
-Standards-Version: 4.0.1
+Standards-Version: 4.1.4
 Homepage: https://github.com/DarkCaster/Fakeroot-UserNS
 
 Package: sandboxer-fakeroot

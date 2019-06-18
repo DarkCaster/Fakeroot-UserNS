@@ -5,6 +5,15 @@ sandboxer-fakeroot (1.22.1__VERSION__SUFFIX__) __DISTRO__; urgency=low
 
  -- DarkCaster <dark.caster@outlook.com>  Wed, 27 Dec 2017 00:00:00 +0000
 
+
+ -- Clint Adams <clint@debian.org>  Mon, 25 Jun 2018 12:52:49 -0400
+
+fakeroot (1.22-2) unstable; urgency=medium
+
+  * Rules-Requires-Root: no
+
+ -- Clint Adams <clint@debian.org>  Fri, 10 Nov 2017 14:28:24 -0500
+
 fakeroot (1.22-1) unstable; urgency=medium
 
   * New upstream version.
