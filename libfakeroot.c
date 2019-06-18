@@ -1929,11 +1929,13 @@ acl_t acl_get_file(const char *path_p, acl_type_t type) {
   return (acl_t)NULL;
 }
 int acl_set_fd(int fd, acl_t acl) {
-  return 0;
+  errno = ENOTSUP;
+  return -1;
 }
 
 int acl_set_file(const char *path_p, acl_type_t type, acl_t acl) {
-  return 0;
+  errno = ENOTSUP;
+  return -1;
 }
 #endif /* HAVE_SYS_ACL_H */
 
