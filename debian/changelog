@@ -3,10 +3,7 @@ sandboxer-fakeroot (1.23.1__VERSION__SUFFIX__) __DISTRO__; urgency=low
   * Helper package for use with sandboxer suite (https://github.com/DarkCaster/Sandboxer)
     based on fakeroot package, contain minor modifications for use with user namespaces
 
- -- DarkCaster <dark.caster@outlook.com>  Wed, 27 Dec 2017 00:00:00 +0000
-
-
- -- Clint Adams <clint@debian.org>  Mon, 25 Jun 2018 12:52:49 -0400
+ -- DarkCaster <dark.caster@outlook.com>  Mon, 24 Jun 2019 00:00:00 +0000
 
 fakeroot (1.22-2) unstable; urgency=medium
 
