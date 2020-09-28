@@ -1,2 +1,5 @@
 .gitignore	export-ignore
 .gitattributes	export-ignore
+/packaging export-ignore
+/.travis.yml export-ignore
+/fakeroot-userns.code-workspace export-ignore
