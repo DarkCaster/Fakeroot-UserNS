@@ -3,7 +3,7 @@ language: c
 os: linux
 
 before_install:
-  - sudo apt-get install --install-recommends -y dput-ng acl-dev libcap-dev libcap2-bin po4a sharutils fakeroot dh-make
+  - sudo apt-get install --install-recommends -y dput-ng quilt acl-dev libcap-dev libcap2-bin po4a sharutils fakeroot dh-make
 
 git:
   depth: 1
