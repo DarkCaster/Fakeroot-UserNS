@@ -1,0 +1,39 @@
+language: c
+
+os: linux
+
+before_install:
+  - sudo apt-get install --install-recommends -y dput-ng acl-dev libcap-dev libcap2-bin po4a sharutils fakeroot dh-make
+
+git:
+  depth: 1
+
+stage_test: &test
+  stage: "Build test"
+  script: QUILT_PATCHES="debian/patches" quilt push -a && ./preroll && mkdir obj-sysv && cd obj-tcp && CFLAGS="$(CFLAGS)" ../configure --prefix="/fixups/fakeroot-host" --bindir="/fixups/fakeroot-host" --libdir="/fixups/fakeroot-host" --mandir="/fixups/fakeroot-host/man" --with-ipc=sysv --with-pic --with-dbformat=path && make && make DESTDIR="/tmp/fakeroot-userns" install
+
+stage_deploy: &deploy
+  stage: "Deploy packages"
+  script: ./packaging/deploy-to-launchpad.sh .ppa$TRAVIS_BUILD_NUMBER~$TRAVIS_DIST $TRAVIS_DIST
+
+jobs:
+  include:
+    - <<: *test
+      os: linux
+      dist: focal
+    - <<: *test
+      os: linux
+      dist: bionic
+    - <<: *test
+      os: linux
+      dist: xenial
+
+    - <<: *deploy
+      os: linux
+      dist: focal
+    - <<: *deploy
+      os: linux
+      dist: bionic
+    - <<: *deploy
+      os: linux
+      dist: xenial
