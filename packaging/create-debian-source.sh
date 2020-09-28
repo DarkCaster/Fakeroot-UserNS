@@ -19,26 +19,15 @@ distro="$4"
 cur_date=`LANG=C date '+%a, %d %b %Y'`
 version="`LANG=C date '+%Y.%m.%d'`$version"
 
-mkdir -p "$target/sandboxer"
-if [[ -d $rootdir/.git ]]; then
-  pushd "$rootdir"
-  git archive --format tar HEAD | (cd "$target/sandboxer" && tar xf -)
-  [[ ! -f $rootdir/BashLuaHelper/lua-helper.bash.in ]] && git submodule update --init
-  (cd "$rootdir/BashLuaHelper" && git archive --format tar HEAD) | (cd "$target/sandboxer/BashLuaHelper" && tar xf -)
-  popd
-else
-  cp -r "$rootdir"/* "$target/sandboxer"
-  rm -rf "$target/sandboxer/Packaging"
-  [[ ! -f $target/sandboxer/BashLuaHelper/lua-helper.bash.in ]] && git clone "https://github.com/DarkCaster/Bash-Lua-Helper.git" "$target/sandboxer/BashLuaHelper"
-  rm -rf "$target/sandboxer/BashLuaHelper"/{.git,.gitignore}
-  rm -rf "$target/sandboxer"/{.git,.gitignore,.gitmodules}
-fi
+pushd "$rootdir"
+mkdir -p "$target/sandboxer-fakeroot"
+git archive --format tar HEAD | (cd "$target/sandboxer-fakeroot" && tar xf -)
+popd
 
-cd "$target/sandboxer"
+cd "$target/sandboxer-fakeroot"
 [[ -z $distro ]] && sed -i "s|__DISTRO__|unstable|g" "debian/changelog"
 [[ ! -z $distro ]] && sed -i "s|__DISTRO__|""$distro""|g" "debian/changelog"
-sed -i "s|__VERSION__|""$version""|g" "debian/changelog"
-sed -i "s|__DATE__|""$cur_date""|g" "debian/changelog"
+sed -i "s|__VERSION__SUFFIX__|""$version""|g" "debian/changelog"
 
 if [[ -z $key ]]; then
   dpkg-buildpackage -d -S -us -uc
@@ -47,4 +36,4 @@ else
 fi
 
 cd ..
-rm -rf "sandboxer"
+rm -rf "sandboxer-fakeroot"
