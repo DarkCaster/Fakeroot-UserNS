@@ -3,7 +3,7 @@ language: c
 os: linux
 
 before_install:
-  - sudo apt-get install --install-recommends -y dput-ng quilt acl-dev libcap-dev libcap2-bin po4a sharutils fakeroot dh-make dh_autoreconf dh_autoreconf_clean
+  - sudo apt-get install --install-recommends -y dput-ng quilt acl-dev libcap-dev libcap2-bin po4a sharutils fakeroot dh-make dh-autoreconf
 
 git:
   depth: 1
