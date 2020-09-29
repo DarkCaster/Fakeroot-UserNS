@@ -27,7 +27,8 @@ popd
 cd "$target/sandboxer-fakeroot"
 [[ -z $distro ]] && sed -i "s|__DISTRO__|unstable|g" "debian/changelog"
 [[ ! -z $distro ]] && sed -i "s|__DISTRO__|""$distro""|g" "debian/changelog"
-sed -i "s|__VERSION__SUFFIX__|""$version""|g" "debian/changelog"
+sed -i "s|__VERSION__|""$version""|g" "debian/changelog"
+sed -i "s|__DATE__|""$cur_date""|g" "debian/changelog"
 
 if [[ -z $key ]]; then
   dpkg-buildpackage -d -S -us -uc
