@@ -24,21 +24,21 @@ dhar-stamp:
 	(cd doc && po4a -k 0 --rm-backups --variable "srcdir=../doc/" po4a/po4a.cfg) || exit 1
 	touch $@
 
-obj-tcp/config.status: dhar-stamp
+obj-sysv/config.status: dhar-stamp
 	dh_testdir
-	mkdir obj-tcp
-	cd obj-tcp && CFLAGS="$(CFLAGS)" ../configure --prefix="/fixups/fakeroot-host" --bindir="/fixups/fakeroot-host" --libdir="/fixups/fakeroot-host" --mandir="/fixups/fakeroot-host/man" --with-ipc=tcp $(CONFARGS)
+	mkdir obj-sysv
+	cd obj-sysv && CFLAGS="$(CFLAGS)" ../configure --prefix="/fixups/fakeroot-host" --bindir="/fixups/fakeroot-host" --libdir="/fixups/fakeroot-host" --mandir="/fixups/fakeroot-host/man" --with-ipc=sysv --with-pic --with-dbformat=path $(CONFARGS)
 
-override_dh_auto_configure: obj-tcp/config.status
+override_dh_auto_configure: obj-sysv/config.status
 
 override_dh_auto_build:
-	cd obj-tcp && $(MAKE)
+	cd obj-sysv && $(MAKE)
 
 override_dh_auto_install:
-	cd obj-tcp && $(MAKE) DESTDIR="$(CURDIR)/$(TARGET_INSTALL_PREFIX)/bin" install
+	cd obj-sysv && $(MAKE) DESTDIR="$(CURDIR)/$(TARGET_INSTALL_PREFIX)/bin" install
 
 override_dh_auto_clean:
-	rm -rf obj-tcp
+	rm -rf obj-sysv
 	dh_autoreconf_clean
 	rm -f dhar-stamp
 	quilt pop -a || true

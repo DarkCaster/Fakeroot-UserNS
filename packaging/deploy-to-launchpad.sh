@@ -22,10 +22,10 @@ key_id=`LANG=C gpg --dry-run --keyid-format long --verbose --import "/tmp/$base/
 gpg --import "/tmp/$base/launchpad.gpg.key"
 
 #create dpkg source files
-"$curdir/create-debian-source.sh" /tmp/sandboxer-dpkgs "$key_id" "$suffix" "$dist"
+"$curdir/create-debian-source.sh" /tmp/fakeroot-dpkgs "$key_id" "$suffix" "$dist"
 
 #deploy it to launchpad
 mkdir -p ~/.ssh
 [[ ! -f ~/.ssh/config.bak && -f ~/.ssh/config ]] && echo "backing up old ssh config file to ~/.ssh/config.bak" && cp ~/.ssh/config ~/.ssh/config.bak
 echo "IdentityFile /tmp/$base/launchpad.ssh.key" > ~/.ssh/config
-yes | dput -c "/tmp/$base/dput.config" launchpad /tmp/sandboxer-dpkgs/sandboxer_*.changes
+yes | dput -c "/tmp/$base/dput.config" launchpad /tmp/fakeroot-dpkgs/sandboxer-fakeroot*.changes

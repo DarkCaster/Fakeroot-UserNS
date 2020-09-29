@@ -10,7 +10,7 @@ git:
 
 stage_test: &test
   stage: "Build test"
-  script: QUILT_PATCHES="debian/patches" quilt push -a && ./preroll && mkdir obj-sysv && cd obj-sysv && CFLAGS="$(CFLAGS)" ../configure --prefix="/fixups/fakeroot-host" --bindir="/fixups/fakeroot-host" --libdir="/fixups/fakeroot-host" --mandir="/fixups/fakeroot-host/man" --with-ipc=sysv --with-pic --with-dbformat=path && make && make DESTDIR="/tmp/fakeroot-userns" install
+  script: QUILT_PATCHES="debian/patches" quilt push -a && ./preroll && mkdir obj-sysv && cd obj-sysv && ../configure --prefix="/fixups/fakeroot-host" --bindir="/fixups/fakeroot-host" --libdir="/fixups/fakeroot-host" --mandir="/fixups/fakeroot-host/man" --with-ipc=sysv --with-pic --with-dbformat=path && make && make DESTDIR="/tmp/fakeroot-userns-install-test" install
 
 stage_deploy: &deploy
   stage: "Deploy packages"
