@@ -2,20 +2,20 @@
 # Copyright (C) 2014 Free Software Foundation, Inc.
 # This file is distributed under the same license as the fakeroot package.
 #
-# Américo Monteiro <a_monteiro@gmx.com>, 2014.
+# Américo Monteiro <a_monteiro@gmx.com>, 2014 - 2020.
 msgid ""
 msgstr ""
-"Project-Id-Version: fakeroot 1.20.1-1\n"
-"POT-Creation-Date: 2014-10-05 11:16-0400\n"
-"PO-Revision-Date: 2014-10-08 22:15+0100\n"
+"Project-Id-Version: fakeroot 1.24-1\n"
+"POT-Creation-Date: 2020-09-22 16:23-0400\n"
+"PO-Revision-Date: 2020-06-07 18:38+0000\n"
 "Last-Translator: Américo Monteiro <a_monteiro@gmx.com>\n"
-"Language-Team: Portuguese <traduz@debianpt.org>\n"
+"Language-Team: Portuguese <>\n"
 "Language: pt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 1.4\n"
+"X-Generator: Lokalize 2.0\n"
 
 #. type: TH
 #: ../doc/fakeroot.1:16
@@ -55,8 +55,8 @@ msgid ""
 "fakeroot - run a command in an environment faking root privileges for file "
 "manipulation"
 msgstr ""
-"fakeroot - corre um comando num ambiente onde finge privilégios de root "
-"para manipulação de ficheiro"
+"fakeroot - corre um comando num ambiente onde finge privilégios de root para "
+"manipulação de ficheiro"
 
 #. type: SH
 #: ../doc/fakeroot.1:22 ../doc/faked.1:22
@@ -98,11 +98,12 @@ msgstr ""
 "utilizadores criar arquivos (tar, ar, .deb etc.) com ficheiros dentro com "
 "permissões/posse de root. Sem o B<fakeroot> seria preciso ter privilégios de "
 "root para criar os ficheiros constituintes dos arquivos com as permissões e "
-"posse actuais, e depois empacotá-los, ou seria preciso construir os arquivos "
-"directamente, sem usar o arquivador."
+"posse atuais, e depois empacota-los, ou seria preciso construir os arquivos "
+"diretamente, sem usar o arquivador."
 
 #. type: Plain text
 #: ../doc/fakeroot.1:61
+#, fuzzy
 #| msgid ""
 #| "B<fakeroot> works by replacing the file manipulation library functions "
 #| "(chmod(2), stat(2) etc.) by ones that simulate the effect the real "
@@ -121,9 +122,8 @@ msgstr ""
 "B<fakeroot> funciona ao substituir as funções da biblioteca de manipulação "
 "de ficheiros (chmod(2), stat(2) etc.), por outras que simulam o efeito que "
 "teriam as funções da biblioteca real, caso o utilizador fosse realmente o "
-"root. Estas funções envolventes estão numa biblioteca partilhada "
-"B</usr/lib/*/libfakeroot-*.so> ou localização semelhante na sua plataforma. "
-"O objecto partilhado é carregado através do mecanismo B<LD_PRELOAD> do "
+"root. Estas funções envolventes estão numa biblioteca partilhada B</usr/lib/"
+"*/libfakeroot-*.so> a qual é carregada através do mecanismo B<LD_PRELOAD> do "
 "carregador dinâmico. (Veja B<ld.so>(8))"
 
 #. type: Plain text
@@ -226,7 +226,7 @@ msgstr ""
 "menos que você deixe os ficheiros que foram \"mexidos\" dentro do fakeroot, "
 "isolados e inalterados quando fora do ambiente. Mesmo assim, isto poderá ser "
 "útil. Por exemplo, pode ser usado com o rsync(1) para salvaguardar e "
-"restaurar árvores de directórios inteiras com informações de utilizador, "
+"restaurar árvores de diretórios inteiras com informações de utilizador, "
 "grupo e dispositivo sem a necessidade de ser root. Veja I</usr/share/doc/"
 "fakeroot/README.saving> para mais detalhes."
 
@@ -417,6 +417,7 @@ msgstr "FICHEIROS"
 
 #. type: Plain text
 #: ../doc/fakeroot.1:175
+#, fuzzy
 #| msgid ""
 #| "I</usr/lib/libfakeroot/libfakeroot.so*> The shared library containing the "
 #| "wrapper functions."
@@ -424,8 +425,8 @@ msgid ""
 "I</usr/lib/*/libfakeroot-*.so> The shared library containing the wrapper "
 "functions."
 msgstr ""
-"I</usr/lib/*/libfakeroot-*.so> A biblioteca partilhada que contém as "
-"funções wrapper."
+"I</usr/lib/libfakeroot/libfakeroot.so*> A biblioteca partilhada que contém "
+"as funções wrapper."
 
 #. type: SH
 #: ../doc/fakeroot.1:175
@@ -449,7 +450,7 @@ msgid ""
 "program were started by the same user)."
 msgstr ""
 "A chave usada para comunicar com o daemon do fakeroot. Qualquer programa "
-"arrancado com o B<LD_PRELOAD> correcto e um B<FAKEROOTKEY> de um daemon em "
+"arrancado com o B<LD_PRELOAD> correto e um B<FAKEROOTKEY> de um daemon em "
 "execução irá ligar-se automaticamente a esse daemon, e terá a mesma visão "
 "\"falsa\" das permissões/propriedades do sistema de ficheiros. (assumindo "
 "que o daemon e o programa que se liga foram arrancados pelo mesmo "
@@ -504,8 +505,8 @@ msgid ""
 "Every command executed within B<fakeroot> needs to be linked to the same "
 "version of the C library as B<fakeroot> itself."
 msgstr ""
-"Cada comando executado dentro do B<fakeroot> precisa de ser linkado "
-"à mesma versão de biblioteca C do próprio B<fakeroot>."
+"Cada comando executado dentro do B<fakeroot> precisa de ser linkado à mesma "
+"versão de biblioteca C do próprio B<fakeroot>."
 
 #. type: IP
 #: ../doc/fakeroot.1:213
@@ -586,7 +587,7 @@ msgstr ""
 "função passar a usar open(), e esqueçam de tentar portá-lo para outro "
 "sistema operativo diferente. Assim Eu decidi manter o número de funções "
 "envolvidas pelo fakeroot o mais pequeno possível, para limitar a "
-"possibilidade de \\(oqcolisões\\(cq."
+"possibilidade de \\(oqcollisions\\(cq."
 
 #. type: IP
 #: ../doc/fakeroot.1:264

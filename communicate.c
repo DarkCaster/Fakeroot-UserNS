@@ -1,6 +1,6 @@
 /*
-  Copyright Ⓒ 1997, 1998, 1999, 2000, 2001  joost witteveen
-  Copyright Ⓒ 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009  Clint Adams
+  Copyright © 1997, 1998, 1999, 2000, 2001  joost witteveen
+  Copyright © 2002-2020  Clint Adams
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -505,8 +505,10 @@ void send_fakem(const struct fake_msg *buf)
 
   if(init_get_msg()!=-1){
     ((struct fake_msg *)buf)->mtype=1;
-    r=msgsnd(msg_snd, (struct fake_msg *)buf,
-	     sizeof(*buf)-sizeof(buf->mtype), 0);
+    do
+      r=msgsnd(msg_snd, (struct fake_msg *)buf,
+	       sizeof(*buf)-sizeof(buf->mtype), 0);
+    while((r==-1) && (errno==EINTR));
     if(r==-1)
       perror("libfakeroot, when sending message");
   }

@@ -1,7 +1,7 @@
 /*
-  Copyright Ⓒ 1997, 1998, 1999, 2000, 2001  joost witteveen
-  Copyright Ⓒ 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009  Clint Adams
-  Copyright Ⓒ 2012 Mikhail Gusarov
+  Copyright © 1997, 1998, 1999, 2000, 2001  joost witteveen
+  Copyright © 2002-2020  Clint Adams
+  Copyright © 2012 Mikhail Gusarov
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -133,6 +133,9 @@
 #if HAVE_FTS_H
 #include <fts.h>
 #endif /* HAVE_FTS_H */
+#ifdef HAVE_SYS_SYSMACROS_H
+# include <sys/sysmacros.h>
+#endif
 #ifdef __sun
 #include <sys/systeminfo.h>
 #endif
@@ -256,10 +259,12 @@ void load_library_symbols(void){
  /* clear dlerror() just in case dlsym() legitimately returns NULL */
     msg = dlerror();
     *(next_wrap[i].doit)=dlsym(get_libc(), next_wrap[i].name);
+#ifdef LIBFAKEROOT_DEBUGGING
+    /* illumos libc creates noise if symbols is not found (e. g. acl_get())*/
     if ( (msg = dlerror()) != NULL){
       fprintf (stderr, "dlsym(%s): %s\n", next_wrap[i].name, msg);
-/*    abort ();*/
     }
+#endif /* LIBFAKEROOT_DEBUGGING */
   }
 }
 
@@ -883,7 +888,7 @@ int fchownat(int dir_fd, const char *path, uid_t owner, gid_t group, int flags) 
   /* If AT_SYMLINK_NOFOLLOW is set in the fchownat call it should
      be when we stat it. */
   INT_STRUCT_STAT st;
-  r=INT_NEXT_FSTATAT(dir_fd, path, &st, (flags & AT_SYMLINK_NOFOLLOW));
+  r=INT_NEXT_FSTATAT(dir_fd, path, &st, (flags & (AT_SYMLINK_NOFOLLOW | AT_EMPTY_PATH | AT_NO_AUTOMOUNT)));
 
   if(r)
     return(r);
@@ -1021,7 +1026,7 @@ int fchmodat(int dir_fd, const char *path, mode_t mode, int flags) {
 
   /* If AT_SYMLINK_NOFOLLOW is set in the fchownat call it should
      be when we stat it. */
-  r=INT_NEXT_FSTATAT(dir_fd, path, &st, flags & AT_SYMLINK_NOFOLLOW);
+  r=INT_NEXT_FSTATAT(dir_fd, path, &st, flags & (AT_SYMLINK_NOFOLLOW | AT_EMPTY_PATH | AT_NO_AUTOMOUNT));
 
   if(r)
     return(r);
@@ -1558,6 +1563,16 @@ int initgroups(const char* user, INITGROUPS_SECOND_ARG group){
     return 0;
 }
 
+int getgroups(int size, gid_t list[]){
+  if (fakeroot_disabled)
+    return next_setgroups(size, list);
+  else {
+    if (size > 0)
+       list[0] = get_faked_gid();
+    return 1;
+  }
+}
+
 int setgroups(SETGROUPS_SIZE_TYPE size, const gid_t *list){
   if (fakeroot_disabled)
     return next_setgroups(size, list);
@@ -1920,6 +1935,9 @@ int fakeroot_isdisabled(void)
 }
 
 #ifdef HAVE_ACL_T
+
+/* linux: */
+#ifdef HAVE_ACL_GET_FD
 acl_t acl_get_fd(int fd) {
   errno = ENOTSUP;
   return (acl_t)NULL;
@@ -1932,12 +1950,51 @@ int acl_set_fd(int fd, acl_t acl) {
   errno = ENOTSUP;
   return -1;
 }
-
 int acl_set_file(const char *path_p, acl_type_t type, acl_t acl) {
   errno = ENOTSUP;
   return -1;
 }
-#endif /* HAVE_SYS_ACL_H */
+#endif /* HAVE_ACL_GET_FD */
+
+/* illumos: */
+#ifdef HAVE_ACL_TRIVIAL
+int acl_get(const char *path, int flags, acl_t **aclp)
+{
+    errno = ENOSYS;
+    return -1;
+}
+int facl_get(int fd, int flags, acl_t **aclp)
+{
+    errno = ENOSYS;
+    return -1;
+}
+int acl_set(const char *path, acl_t *aclp)
+{
+    errno = ENOSYS;
+    return -1;
+}
+int facl_set(int fd, acl_t *aclp)
+{
+    errno = ENOSYS;
+    return -1;
+}
+int acl_trivial(const char *path)
+{
+    return 0;
+}
+int acl(const char *path, int cmd, int cnt, void *buf)
+{
+    errno = ENOSYS;
+    return -1;
+}
+int facl(int fd, int cmd, int cnt, void *buf)
+{
+    errno = ENOSYS;
+    return -1;
+}
+#endif /* HAVE_ACL_TRIVIAL */
+
+#endif /* HAVE_ACL_T */
 
 #ifdef HAVE_FTS_READ
 FTSENT *fts_read(FTS *ftsp) {
@@ -2400,6 +2457,41 @@ int posix_spawnp(pid_t * __restrict pid, const char * __restrict file,
 }
 #endif /* MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5 */
 #endif /* ifdef __APPLE__ */
+
+#ifdef HAVE_STATX
+int statx (int dirfd, const char *path, int flags, unsigned int mask, struct statx *buf)
+{
+  int r;
+  INT_STRUCT_STAT st;
+
+  if (fakeroot_disabled)
+    return next_statx(dirfd, path, flags, mask, buf);
+
+#ifdef LIBFAKEROOT_DEBUGGING
+  if (fakeroot_debug) {
+    fprintf(stderr, "statx fd %d\n", fd);
+  }
+#endif /* LIBFAKEROOT_DEBUGGING */
+  r=INT_NEXT_FSTATAT(dirfd, path, &st, flags);
+  if(r)
+    return -1;
+  SEND_GET_STAT(&st,ver);
+
+  r=next_statx(dirfd, path, flags, mask, buf);
+  if(r)
+    return -1;
+
+  buf->stx_uid = st.st_uid;
+  buf->stx_gid = st.st_gid;
+  buf->stx_mode = st.st_mode;
+
+  buf->stx_rdev_major = major(st.st_rdev);
+  buf->stx_rdev_minor = minor(st.st_rdev);
+
+  return 0;
+}
+#endif /* HAVE_STATX */
+
 
 #ifdef __sun
 /*

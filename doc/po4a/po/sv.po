@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: fakeroot 1.22-1\n"
-"POT-Creation-Date: 2017-08-16 22:29-0400\n"
+"POT-Creation-Date: 2020-09-22 16:23-0400\n"
 "PO-Revision-Date: 2017-09-20 00:22+0200\n"
 "Last-Translator: Sebastian Rasmussen <sebras@gmail.com>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
@@ -44,8 +44,8 @@ msgid "Debian manual"
 msgstr "Debian manual"
 
 # type: SH
-#. Manpage by J.H.M. Dassen <jdassen@debian.org>
-#. and Clint Adams
+#.  Manpage by J.H.M. Dassen <jdassen@debian.org>
+#.  and Clint Adams
 #. type: SH
 #: ../doc/fakeroot.1:19 ../doc/faked.1:19
 #, no-wrap
@@ -111,6 +111,15 @@ msgstr ""
 # type: Plain text
 #. type: Plain text
 #: ../doc/fakeroot.1:61
+#, fuzzy
+#| msgid ""
+#| "B<fakeroot> works by replacing the file manipulation library functions "
+#| "(chmod(2), stat(2) etc.) by ones that simulate the effect the real "
+#| "library functions would have had, had the user really been root. These "
+#| "wrapper functions are in a shared library B</usr/lib/*/libfakeroot-*.so> "
+#| "or similar location on your platform.  The shared object is loaded "
+#| "through the B<LD_PRELOAD> mechanism of the dynamic loader. (See B<ld."
+#| "so>(8))"
 msgid ""
 "B<fakeroot> works by replacing the file manipulation library functions "
 "(chmod(2), stat(2) etc.) by ones that simulate the effect the real library "
@@ -444,6 +453,10 @@ msgstr "FILER"
 # type: Plain text
 #. type: Plain text
 #: ../doc/fakeroot.1:175
+#, fuzzy
+#| msgid ""
+#| "I</usr/lib/*/libfakeroot-*.so> The shared library containing the wrapper "
+#| "functions."
 msgid ""
 "I</usr/lib/*/libfakeroot-*.so> The shared library containing the wrapper "
 "functions."

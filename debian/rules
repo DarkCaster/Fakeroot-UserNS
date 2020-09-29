@@ -3,8 +3,8 @@ export QUILT_PATCHES=debian/patches
 export QUILT_REFRESH_ARGS="-p ab --no-timestamps --no-index"
 export DH_VERBOSE = 1
 
-DEB_BUILD_GNU_TYPE = $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
-DEB_HOST_GNU_TYPE = $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+include /usr/share/dpkg/architecture.mk
+
 ifneq ($(DEB_BUILD_GNU_TYPE),$(DEB_HOST_GNU_TYPE))
 CONFARGS = --host=$(DEB_HOST_GNU_TYPE)
 endif

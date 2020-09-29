@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT([fakeroot],[1.23],[clint@debian.org],[fakeroot])
+AC_INIT([fakeroot],[1.25.1],[clint@debian.org],[fakeroot])
 AC_PREREQ([2.69])
 AC_CONFIG_MACRO_DIR([build-aux])
 LT_PREREQ(2.1a)
@@ -24,6 +24,42 @@ AC_ARG_WITH([ipc],
 AC_CACHE_CHECK([which IPC method to use],
 	       [ac_cv_use_ipc],
 	       [ac_cv_use_ipc=sysv])
+
+if test $ac_cv_use_ipc = "sysv"; then
+  AC_MSG_CHECKING([whether SysV IPC message queues are actually working on the host])
+
+  AC_LANG_PUSH(C)
+  AC_TRY_RUN([
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <time.h>
+#include <unistd.h>
+
+int main() {
+
+  srandom(time(NULL)+getpid()*33151);
+  key_t msg_key = random();
+  int msg_get = msgget(msg_key, IPC_CREAT|0600);
+
+  if (msg_get==-1) {
+    return 1;
+  } else {
+    msgctl(msg_get, IPC_RMID, NULL);
+    return 0;
+  }
+
+}], [ac_cv_use_ipc=sysv], [ac_cv_use_ipc=tcp])
+
+  if test $ac_cv_use_ipc = "tcp"; then
+    AC_MSG_RESULT([No, using TCP])
+  else
+    AC_MSG_RESULT([Yes])
+  fi
+
+  AC_LANG_POP(C)
+fi
 
 AC_ARG_WITH([dbformat],
 	    AS_HELP_STRING([--with-dbformat@<:@=DBFORMAT@:>@],
@@ -289,7 +325,19 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 
 AC_CHECK_FUNCS(fchmodat fchownat fstatat mkdirat mknodat openat renameat unlinkat lchmod fgetattrlist)
 
+save_LIBS="$LIBS"
+# Linux
+AC_SEARCH_LIBS(acl_get_fd, acl)
+AC_CHECK_FUNCS(acl_get_fd)
+
+# Illumos
+AC_SEARCH_LIBS(acl_trivial, sec)
+AC_CHECK_FUNCS(acl_trivial)
+LIBS="$save_LIBS"
+
 AC_CHECK_FUNCS(capset listxattr llistxattr flistxattr getxattr lgetxattr fgetxattr setxattr lsetxattr fsetxattr removexattr lremovexattr fremovexattr)
+
+AC_CHECK_FUNCS(statx)
 
 dnl find out how stat() etc are called. On linux systems, we really
 dnl need to wrap (IIRC):
