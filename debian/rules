@@ -20,8 +20,11 @@ TARGET_INSTALL_PREFIX=debian/$(PACKAGE)$(TARGET_PREFIX)
 
 dhar-stamp:
 	quilt push -a
+	sed -i '/doc\//d' ./configure.ac
+	sed -i '/po4a/d' ./preroll
+	sed -i 's|doc||g' ./Makefile.am
+	rm -rf ./doc
 	dh_autoreconf
-	(cd doc && po4a -k 0 --rm-backups --variable "srcdir=../doc/" po4a/po4a.cfg) || exit 1
 	touch $@
 
 obj-sysv/config.status: dhar-stamp
