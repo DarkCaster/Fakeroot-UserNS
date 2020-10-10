@@ -1076,14 +1076,33 @@ void process_msg(struct fake_msg *buf){
 void get_msg()
 {
   struct fake_msg buf;
+  struct fake_msg_buf fm = { 0 };
+  uint32_t k = 0;
+  uint8_t* ptr = NULL;
   int r = 0;
 
   if(debug)
     fprintf(stderr,"FAKEROOT: msg=%i, key=%li\n",msg_get,(long)msg_key);
   do {
-    r=msgrcv(msg_get,&buf,sizeof(struct fake_msg),0,0);
+    r=msgrcv(msg_get,&fm,sizeof(struct fake_msg_buf),0,0);
+
+    ptr = &fm;
+    for (k=0; k<16; k++) {
+      if (*(uint32_t*)&ptr[k] == FAKEROOT_MAGIC) {
+        memcpy(&buf, &ptr[k], sizeof(buf));
+        break;
+      }
+    }
+
+    if (k == 16) {
+      fprintf(stderr,
+              "faked internal error: payload not recognized!\n");
+      continue;
+    }
+
     if(debug)
-      fprintf(stderr,"FAKEROOT: r=%i, received message type=%li, message=%i\n",r,buf.mtype,buf.id);
+      fprintf(stderr,"FAKEROOT: r=%i, received message type=%li, message=%i\n",r,fm.mtype,buf.id);
+
     if(r!=-1) {
       buf.remote = 0;
       process_msg(&buf);

@@ -39,6 +39,12 @@
 
 #define FAKEROOTKEY_ENV "FAKEROOTKEY"
 
+/* The magic value must be positive itself and be still positive if
+ * it becomes a high-dword of an uint64_t. Otherwise msgsnd(2) on x32
+ * platform thinks mtype is 64-bit negative number and returns -EINVAL.
+ */
+#define FAKEROOT_MAGIC 0x76767676
+
 typedef uint32_t func_id_t;
 
 typedef uint64_t fake_ino_t;
@@ -83,7 +89,7 @@ struct fakexattr {
 #endif
 struct fake_msg {
 #ifndef FAKEROOT_FAKENET
-	long mtype; /* message type in SYSV message sending */
+	uint32_t magic; /* marker to detect cross-architecture mtype fluctuations */
 #endif
 	func_id_t       id; /* the requested function */
 #ifndef FAKEROOT_FAKENET
@@ -94,6 +100,20 @@ struct fake_msg {
 	struct fakexattr xattr;
 	uint32_t        remote;
 } FAKEROOT_ATTR(packed);
+#if __SUNPRO_C
+#pragma pack()
+#endif
+
+#if __SUNPRO_C
+#pragma pack(4)
+#endif
+struct fake_msg_buf {
+#ifndef FAKEROOT_FAKENET
+	long mtype; /* message type in SYSV message sending */
+#endif
+	char msg[sizeof(struct fake_msg) + 8];
+} FAKEROOT_ATTR(packed);
+
 #if __SUNPRO_C
 #pragma pack()
 #endif

@@ -511,12 +511,15 @@ void unlock_comm_sd(void)
 void send_fakem(const struct fake_msg *buf)
 {
   int r;
+  struct fake_msg_buf fm = { 0 };
 
   if(init_get_msg()!=-1){
-    ((struct fake_msg *)buf)->mtype=1;
+    memcpy(&fm.msg, buf, sizeof(*buf));
+    fm.mtype=1;
+    ((struct fake_msg*)&fm.msg)->magic=FAKEROOT_MAGIC;
     do
-      r=msgsnd(msg_snd, (struct fake_msg *)buf,
-	       sizeof(*buf)-sizeof(buf->mtype), 0);
+      r=msgsnd(msg_snd, &fm,
+	       sizeof(fm)-sizeof(fm.mtype), 0);
     while((r==-1) && (errno==EINTR));
     if(r==-1)
       perror("libfakeroot, when sending message");
@@ -548,8 +551,11 @@ void send_get_fakem(struct fake_msg *buf)
   there will always be some (small) chance it will go wrong.
   */
 
+  struct fake_msg_buf fm = { 0 };
+  uint32_t k = 0;
   int l;
   pid_t pid;
+  uint8_t* ptr = NULL;
   static int serial=0;
 
   if(init_get_msg()!=-1){
@@ -560,11 +566,25 @@ void send_get_fakem(struct fake_msg *buf)
     buf->pid=pid;
     send_fakem(buf);
 
-    do
+    do {
       l=msgrcv(msg_get,
-               (struct my_msgbuf*)buf,
-               sizeof(*buf)-sizeof(buf->mtype),0,0);
-    while(((l==-1)&&(errno==EINTR))||(buf->serial!=serial)||buf->pid!=pid);
+               &fm,
+               sizeof(fm)-sizeof(fm.mtype),0,0);
+
+      ptr = &fm;
+      for (k=0; k<16; k++) {
+        if (*(uint32_t*)&ptr[k] == FAKEROOT_MAGIC) {
+          memcpy(buf, &ptr[k], sizeof(*buf));
+          break;
+        }
+      }
+
+      if (k == 16) {
+        fprintf(stderr,
+               "libfakeroot internal error: payload not recognized!\n");
+        continue;
+      }
+    }while(((l==-1)&&(errno==EINTR))||(buf->serial!=serial)||buf->pid!=pid);
 
     if(l==-1){
       buf->xattr.flags_rc=errno;
