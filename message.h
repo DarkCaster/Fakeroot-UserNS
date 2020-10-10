@@ -88,7 +88,7 @@ struct fake_msg {
 	func_id_t       id; /* the requested function */
 #ifndef FAKEROOT_FAKENET
 	pid_t pid;
-	int serial;
+	int32_t serial;
 #endif
 	struct fakestat st;
 	struct fakexattr xattr;
