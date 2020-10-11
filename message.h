@@ -111,7 +111,7 @@ struct fake_msg_buf {
 #ifndef FAKEROOT_FAKENET
 	long mtype; /* message type in SYSV message sending */
 #endif
-	char msg[sizeof(struct fake_msg) + 8];
+	char msg[sizeof(struct fake_msg)];
 } FAKEROOT_ATTR(packed);
 
 #if __SUNPRO_C
