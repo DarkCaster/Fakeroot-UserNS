@@ -516,7 +516,11 @@ void send_fakem(const struct fake_msg *buf)
   if(init_get_msg()!=-1){
     memcpy(&fm.msg, buf, sizeof(*buf));
     fm.mtype=1;
-    ((struct fake_msg*)&fm.msg)->magic=FAKEROOT_MAGIC;
+#if __BYTE_ORDER == __BIG_ENDIAN
+    ((struct fake_msg*)&fm.msg)->magic=FAKEROOT_MAGIC_BE;
+#elif __BYTE_ORDER == __LITTLE_ENDIAN
+    ((struct fake_msg*)&fm.msg)->magic=FAKEROOT_MAGIC_LE;
+#endif
     do
       r=msgsnd(msg_snd, &fm,
 	       sizeof(fm)-sizeof(fm.mtype), 0);
@@ -553,6 +557,7 @@ void send_get_fakem(struct fake_msg *buf)
 
   struct fake_msg_buf fm = { 0 };
   uint32_t k = 0;
+  uint32_t magic_candidate = 0;
   int l;
   pid_t pid;
   uint8_t* ptr = NULL;
@@ -573,7 +578,8 @@ void send_get_fakem(struct fake_msg *buf)
 
       ptr = &fm;
       for (k=0; k<16; k++) {
-        if (*(uint32_t*)&ptr[k] == FAKEROOT_MAGIC) {
+        magic_candidate = *(uint32_t*)&ptr[k];
+        if (magic_candidate == FAKEROOT_MAGIC_LE || magic_candidate == FAKEROOT_MAGIC_BE) {
           memcpy(buf, &ptr[k], sizeof(*buf));
           break;
         }
@@ -583,6 +589,30 @@ void send_get_fakem(struct fake_msg *buf)
         fprintf(stderr,
                "libfakeroot internal error: payload not recognized!\n");
         continue;
+      }
+
+      /*
+        Use swapX here instead of ntoh/hton
+        that do nothing on big-endian machines
+      */
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+      if (magic_candidate == FAKEROOT_MAGIC_BE) {
+#elif __BYTE_ORDER == __BIG_ENDIAN
+      if (magic_candidate == FAKEROOT_MAGIC_LE) {
+#endif
+         buf->id = bswapl(buf->id);
+         buf->pid = bswapl(buf->pid);
+         buf->serial = bswapl(buf->serial);
+         buf->st.uid = bswapl(buf->st.uid);
+         buf->st.gid = bswapl(buf->st.gid);
+         buf->st.ino = bswapll(buf->st.ino);
+         buf->st.dev = bswapll(buf->st.dev);
+         buf->st.rdev = bswapll(buf->st.rdev);
+         buf->st.mode = bswapl(buf->st.mode);
+         buf->st.nlink = bswapl(buf->st.nlink);
+         buf->remote = bswapl(0);
+         buf->xattr.buffersize = bswapl(buf->xattr.buffersize);
+         buf->xattr.flags_rc = bswapl(buf->xattr.flags_rc);
       }
     }while(((l==-1)&&(errno==EINTR))||(buf->serial!=serial)||buf->pid!=pid);
 
@@ -601,7 +631,6 @@ void send_get_fakem(struct fake_msg *buf)
     printf("libfakeroot/fakeroot, internal bug!! get_fake: length=%i != l=%i",
     sizeof(*buf)-sizeof(buf->mtype),l);
     */
-
   }
 }
 

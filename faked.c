@@ -1078,6 +1078,7 @@ void get_msg()
   struct fake_msg buf;
   struct fake_msg_buf fm = { 0 };
   uint32_t k = 0;
+  uint32_t magic_candidate = 0;
   uint8_t* ptr = NULL;
   int r = 0;
 
@@ -1088,7 +1089,8 @@ void get_msg()
 
     ptr = &fm;
     for (k=0; k<16; k++) {
-      if (*(uint32_t*)&ptr[k] == FAKEROOT_MAGIC) {
+      magic_candidate = *(uint32_t*)&ptr[k];
+      if (magic_candidate == FAKEROOT_MAGIC_LE || magic_candidate == FAKEROOT_MAGIC_BE) {
         memcpy(&buf, &ptr[k], sizeof(buf));
         break;
       }
@@ -1098,6 +1100,30 @@ void get_msg()
       fprintf(stderr,
               "faked internal error: payload not recognized!\n");
       continue;
+    }
+
+    /*
+      Use swapX here instead of ntoh/hton
+      that do nothing on big-endian machines
+    */
+#if   __BYTE_ORDER == __LITTLE_ENDIAN
+    if (magic_candidate == FAKEROOT_MAGIC_BE) {
+#elif   __BYTE_ORDER == __BIG_ENDIAN
+    if (magic_candidate == FAKEROOT_MAGIC_LE) {
+#endif
+         buf.id = bswapl(buf.id);
+         buf.pid = bswapl(buf.pid);
+         buf.serial = bswapl(buf.serial);
+         buf.st.uid = bswapl(buf.st.uid);
+         buf.st.gid = bswapl(buf.st.gid);
+         buf.st.ino = bswapll(buf.st.ino);
+         buf.st.dev = bswapll(buf.st.dev);
+         buf.st.rdev = bswapll(buf.st.rdev);
+         buf.st.mode = bswapl(buf.st.mode);
+         buf.st.nlink = bswapl(buf.st.nlink);
+         buf.remote = bswapl(0);
+         buf.xattr.buffersize = bswapl(buf.xattr.buffersize);
+         buf.xattr.flags_rc = bswapl(buf.xattr.flags_rc);
     }
 
     if(debug)
