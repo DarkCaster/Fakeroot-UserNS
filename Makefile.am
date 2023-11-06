@@ -57,6 +57,8 @@ endif !MACOSX
 
 libfakeroot.lo:libfakeroot.c wrapdef.h wrapstruct.h wraptmpf.h
 
+libfakeroot_time64.c: wrapped.h
+
 fakerootconfig.h: ./config.status
 	CONFIG_FILES= CONFIG_HEADERS= /bin/sh ./config.status
 
