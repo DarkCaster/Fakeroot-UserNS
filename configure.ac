@@ -745,7 +745,7 @@ AC_CONFIG_FILES([
    Makefile
    scripts/Makefile
    doc/Makefile
-   doc/de/Makefile doc/es/Makefile doc/fr/Makefile doc/nl/Makefile doc/pt/Makefile doc/sv/Makefile
+   doc/de/Makefile doc/es/Makefile doc/fr/Makefile doc/nl/Makefile doc/pt/Makefile doc/ro/Makefile doc/sv/Makefile
    test/Makefile test/defs])
 AC_OUTPUT
 

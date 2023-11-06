@@ -1,4 +1,4 @@
-PO4A-HEADER:mode=after;position=^\.SH NOM;beginboundary=FausseLimitePo4a
+PO4A-HEADER:mode=after;position=AUTORI;beginboundary=FausseLimitePo4a
 .SH TRADUCERE
 Această traducere a fost creată în 2023 de Remus-Gabriel Chelu. Ea este supusă
 licenței GNU GPL versiunea 2 (sau ulterioară).
