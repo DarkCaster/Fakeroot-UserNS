@@ -1,0 +1,44 @@
+Source: fakeroot
+Section: utils
+Priority: optional
+Build-Depends: debhelper-compat (= 13),
+               libacl1-dev,
+               libcap-dev [linux-any],
+               libcap2-bin [linux-any],
+               po4a <!nodoc>,
+               sharutils <!nocheck>
+Maintainer: Clint Adams <clint@debian.org>
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+Vcs-Git: https://salsa.debian.org/clint/fakeroot.git
+Vcs-Browser: https://salsa.debian.org/clint/fakeroot
+
+Package: fakeroot
+Architecture: any
+Multi-Arch: foreign
+Depends: libfakeroot (>= ${binary:Version}), ${misc:Depends}, ${shlibs:Depends}
+Description: tool for simulating superuser privileges
+ fakeroot provides a fake "root environment" by means of LD_PRELOAD and
+ SysV IPC (or TCP) trickery. It puts wrappers around getuid(), chown(),
+ stat(), and other file-manipulation functions, so that unprivileged
+ users can (for instance) populate .deb archives with root-owned files;
+ various build tools use fakeroot for this by default.
+ .
+ This package contains fakeroot command and the daemon that remembers
+ fake ownership/permissions of files manipulated by fakeroot
+ processes.
+
+Package: libfakeroot
+Architecture: any
+Multi-Arch: same
+Replaces: fakeroot (<< 1.20-2~)
+Breaks: fakeroot (<< 1.20-2~)
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: tool for simulating superuser privileges - shared libraries
+ fakeroot provides a fake "root environment" by means of LD_PRELOAD and
+ SysV IPC (or TCP) trickery. It puts wrappers around getuid(), chown(),
+ stat(), and other file-manipulation functions, so that unprivileged
+ users can (for instance) populate .deb archives with root-owned files;
+ various build tools use fakeroot for this by default.
+ .
+ This package contains the LD_PRELOAD libraries.
