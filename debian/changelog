@@ -1,3 +1,13 @@
+fakeroot (1.32.2-1) unstable; urgency=medium
+
+  * New upstream version.
+    - Romanian man page translation from Remus-Gabriel Chelu.
+      closes: #1055386.
+    - patch from Rudi Heitbaum to add missing wrapped.h dependency.
+      closes: #1041674.
+
+ -- Clint Adams <clint@debian.org>  Mon, 06 Nov 2023 07:15:47 -0500
+
 fakeroot (1.32.1-1) unstable; urgency=medium
 
   * New upstream version.
