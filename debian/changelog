@@ -1,3 +1,11 @@
+fakeroot (1.33-1) unstable; urgency=medium
+
+  * New upstream version.
+    - Patch from Samuel Thibault to add renameat2 support.
+      closes: #1061257.
+
+ -- Clint Adams <clint@debian.org>  Sun, 21 Jan 2024 11:56:06 -0500
+
 fakeroot (1.32.2-1) unstable; urgency=medium
 
   * New upstream version.
