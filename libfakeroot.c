@@ -1382,6 +1382,29 @@ int renameat(int olddir_fd, const char *oldpath,
   return 0;
 }
 #endif /* HAVE_RENAMEAT */
+#ifdef HAVE_RENAMEAT2
+int renameat2(int olddir_fd, const char *oldpath,
+              int newdir_fd, const char *newpath, unsigned int flags){
+  int r,s;
+  INT_STRUCT_STAT st;
+
+  /* If newpath points to an existing file, that file will be
+     unlinked.   Make sure we tell the faked daemon about this! */
+
+  /* we need the st_new struct in order to inform faked about the
+     (possible) unlink of the file */
+
+  r=INT_NEXT_FSTATAT(newdir_fd, newpath, &st, AT_SYMLINK_NOFOLLOW);
+
+  s=next_renameat2(olddir_fd, oldpath, newdir_fd, newpath, flags);
+  if(s)
+    return -1;
+  if(!r)
+    INT_SEND_STAT(&st,unlink_func);
+
+  return 0;
+}
+#endif /* HAVE_RENAMEAT2 */
 #endif /* HAVE_FSTATAT */
 
 
