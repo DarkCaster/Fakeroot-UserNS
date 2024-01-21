@@ -203,6 +203,9 @@ mkdirat;int;(int dir_fd, const char *pathname, mode_t mode);(dir_fd, pathname, m
 #ifdef HAVE_RENAMEAT
 renameat;int;(int olddir_fd, const char *oldpath, int newdir_fd, const char *newpath);(olddir_fd, oldpath, newdir_fd, newpath)
 #endif /* HAVE_RENAMEAT */
+#ifdef HAVE_RENAMEAT2
+renameat2;int;(int olddir_fd, const char *oldpath, int newdir_fd, const char *newpath, unsigned int flags);(olddir_fd, oldpath, newdir_fd, newpath, flags)
+#endif /* HAVE_RENAMEAT2 */
 #ifdef HAVE_UNLINKAT
 unlinkat;int;(int dir_fd, const char *pathname, int flags);(dir_fd, pathname, flags)
 #endif /* HAVE_UNLINKAT */
