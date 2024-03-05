@@ -1483,6 +1483,7 @@ int main(int argc, char **argv){
     case SIGKILL:
     case SIGTSTP:
     case SIGCONT:
+    case SIGWINCH:
       break;
     case SIGUSR1:
       /* this is strictly a debugging feature, unless someone can confirm
