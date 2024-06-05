@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT([fakeroot],[1.34],[clint@debian.org],[fakeroot])
+AC_INIT([fakeroot],[1.35],[clint@debian.org],[fakeroot])
 AC_PREREQ([2.71])
 AC_CONFIG_MACRO_DIR([build-aux])
 LT_PREREQ(2.1a)
@@ -601,7 +601,7 @@ AC_SUBST(LDPRELOADABS)
 AC_SUBST(LDEXTRAVAR)
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(strdup strstr getresuid setresuid getresgid setresgid setfsuid setfsgid fts_read fts_children)
+AC_CHECK_FUNCS(strdup strstr getresuid setresuid getresgid setresgid setfsuid setfsgid fts_read fts_children close_range)
 
 AC_CHECK_DECLS([setenv, unsetenv])
 AC_REPLACE_FUNCS([setenv])
