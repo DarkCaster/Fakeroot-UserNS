@@ -79,6 +79,8 @@
    (def in ./linux/msg.h, couldn't find other def in /usr/include/
    */
 
+#define _GNU_SOURCE
+
 #ifdef __APPLE__
 /*
    In this file, we want 'struct stat' to have a 32-bit 'ino_t'.
@@ -1512,12 +1514,21 @@ int main(int argc, char **argv){
 
       fflush(stdout);
 
+#ifdef HAVE_CLOSE_RANGE
+# ifdef FAKEROOT_FAKENET
+      close_range(0, sd-1, 0);
+      close_range(sd+1, num_fds, 0);
+# else /* !FAKEROOT_FAKENET */
+      close_range(0, num_fds, 0);
+# endif
+#else /* ! HAVE_CLOSE_RANGE */
       /* This is the child closing its file descriptors. */
       for (fl= 0; fl <= num_fds; ++fl)
-#ifdef FAKEROOT_FAKENET
+# ifdef FAKEROOT_FAKENET
 	if (fl != sd)
-#endif /* FAKEROOT_FAKENET */
+# endif /* FAKEROOT_FAKENET */
 	  close(fl);
+#endif
       setsid();
     } else {
       printf("%li:%i\n",(long)FAKE_KEY,pid);
