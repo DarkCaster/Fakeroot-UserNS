@@ -127,9 +127,8 @@ msgstr ""
 "Auswirkungen simulieren, die die echten Funktionen hätten, wenn der Benutzer "
 "Root wäre. Diese Wrapper-Funktionen liegen in einer gemeinsam benutzten "
 "Bibliothek B</usr/lib/*/libfakeroot.so*> oder einem ähnlichen Ort auf Ihrer "
-"Plattform. Das gemeinsam benutzte Objekt wird durch den "
-"B<LD_PRELOAD>-Mechanismus des dynamischen Ladeprogramms geladen. (Siehe "
-"B<ld.so>(8))"
+"Plattform. Das gemeinsam benutzte Objekt wird durch den B<LD_PRELOAD>-"
+"Mechanismus des dynamischen Ladeprogramms geladen. (Siehe B<ld.so>(8))"
 
 # type: Plain text
 #. type: Plain text
@@ -453,9 +452,6 @@ msgstr "DATEIEN"
 # type: Plain text
 #. type: Plain text
 #: ../doc/fakeroot.1:175
-#| msgid ""
-#| "I</usr/lib/libfakeroot/libfakeroot.so*> The shared library containing the "
-#| "wrapper functions."
 msgid ""
 "I</usr/lib/*/libfakeroot-*.so> The shared library containing the wrapper "
 "functions."
@@ -519,8 +515,8 @@ msgid ""
 "That library is loaded before the system's C library, and so most of the "
 "library functions are intercepted by it.  If you need to set either "
 "B<LD_LIBRARY_PATH> or B<LD_PRELOAD> from within a fakeroot environment, it "
-"should be set relative to the given paths, as in B<LD_LIBRARY_PATH="
-"$LD_LIBRARY_PATH:/foo/bar/>"
+"should be set relative to the given paths, as in "
+"B<LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/foo/bar/>"
 msgstr ""
 "fakeroot wurde durch Verhüllen von Systemaufrufen implementiert. Dies wird "
 "durch die Einstellungen LD_LIBRARY_PATH=/usr/lib/fakeroot und "
