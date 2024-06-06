@@ -111,6 +111,7 @@ AC_C_CONST
 AC_CHECK_TYPE(mode_t, int)
 AC_CHECK_TYPE(off_t, long)
 AC_CHECK_TYPE(size_t, unsigned)
+AC_CHECK_TYPE(id_t, int)
 
 AH_TEMPLATE([FAKEROOT_ATTR], [for packed])
 if test -n "$GCC";
