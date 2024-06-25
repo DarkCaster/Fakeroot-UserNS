@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT([fakeroot],[1.35],[clint@debian.org],[fakeroot])
+AC_INIT([fakeroot],[1.35.1],[clint@debian.org],[fakeroot])
 AC_PREREQ([2.71])
 AC_CONFIG_MACRO_DIR([build-aux])
 LT_PREREQ(2.1a)
@@ -111,6 +111,7 @@ AC_C_CONST
 AC_CHECK_TYPE(mode_t, int)
 AC_CHECK_TYPE(off_t, long)
 AC_CHECK_TYPE(size_t, unsigned)
+AC_CHECK_TYPE(id_t, int)
 
 AH_TEMPLATE([FAKEROOT_ATTR], [for packed])
 if test -n "$GCC";

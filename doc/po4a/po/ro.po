@@ -48,8 +48,8 @@ msgstr "Proiectul Debian"
 msgid "Debian manual"
 msgstr "Manual de Debian"
 
-#. Manpage by J.H.M. Dassen <jdassen@debian.org>
-#. and Clint Adams
+#.  Manpage by J.H.M. Dassen <jdassen@debian.org>
+#.  and Clint Adams
 #. type: SH
 #: ../doc/fakeroot.1:19 ../doc/faked.1:19
 #, no-wrap
@@ -638,8 +638,8 @@ msgstr ""
 "deschiderea eșuează, deoarece modul fișierului va fi 000. Eroarea este că, "
 "dacă root face același lucru, open() va reuși, deoarece permisiunile "
 "fișierului nu sunt verificate deloc pentru root. Am ales să nu învăluim "
-"open(), deoarece open() este folosit de multe alte funcții din "
-"„libc” (inclusiv de cele care sunt deja învăluite), creând astfel bucle (sau "
+"open(), deoarece open() este folosit de multe alte funcții din „libc” "
+"(inclusiv de cele care sunt deja învăluite), creând astfel bucle (sau "
 "posibile bucle viitoare, atunci când implementarea diferitelor funcții "
 "„libc” se va schimba un pic)."
 

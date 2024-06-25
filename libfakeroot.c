@@ -139,13 +139,6 @@
 #define INT_SEND_STAT(a,b) SEND_STAT(a,b,_STAT_VER)
 #define INT_SEND_GET_XATTR(a,b) SEND_GET_XATTR(a,b,_STAT_VER)
 #define INT_SEND_GET_STAT(a,b) SEND_GET_STAT(a,b)
-
-/* 10.10 uses id_t in getpriority/setpriority calls, so pretend
-   id_t is used everywhere, just happens to be int on some OSes */
-#ifndef _ID_T
-#define _ID_T
-typedef int id_t;
-#endif
 #endif
 
 #include <sys/types.h>

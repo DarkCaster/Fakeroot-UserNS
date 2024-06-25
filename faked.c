@@ -1078,14 +1078,59 @@ void process_msg(struct fake_msg *buf){
 void get_msg()
 {
   struct fake_msg buf;
+  struct fake_msg_buf fm = { 0 };
+  uint32_t k = 0;
+  uint32_t magic_candidate = 0;
+  uint8_t* ptr = NULL;
   int r = 0;
 
   if(debug)
     fprintf(stderr,"FAKEROOT: msg=%i, key=%li\n",msg_get,(long)msg_key);
   do {
-    r=msgrcv(msg_get,&buf,sizeof(struct fake_msg),0,0);
+    r=msgrcv(msg_get,&fm,sizeof(struct fake_msg_buf),0,0);
+
+    ptr = &fm;
+    for (k=0; k<16; k++) {
+      magic_candidate = *(uint32_t*)&ptr[k];
+      if (magic_candidate == FAKEROOT_MAGIC_LE || magic_candidate == FAKEROOT_MAGIC_BE) {
+        memcpy(&buf, &ptr[k], sizeof(buf));
+        break;
+      }
+    }
+
+    if (k == 16) {
+      fprintf(stderr,
+              "faked internal error: payload not recognized!\n");
+      continue;
+    }
+
+    /*
+      Use swapX here instead of ntoh/hton
+      that do nothing on big-endian machines
+    */
+#if   __BYTE_ORDER == __LITTLE_ENDIAN
+    if (magic_candidate == FAKEROOT_MAGIC_BE) {
+#elif   __BYTE_ORDER == __BIG_ENDIAN
+    if (magic_candidate == FAKEROOT_MAGIC_LE) {
+#endif
+         buf.id = bswapl(buf.id);
+         buf.pid = bswapl(buf.pid);
+         buf.serial = bswapl(buf.serial);
+         buf.st.uid = bswapl(buf.st.uid);
+         buf.st.gid = bswapl(buf.st.gid);
+         buf.st.ino = bswapll(buf.st.ino);
+         buf.st.dev = bswapll(buf.st.dev);
+         buf.st.rdev = bswapll(buf.st.rdev);
+         buf.st.mode = bswapl(buf.st.mode);
+         buf.st.nlink = bswapl(buf.st.nlink);
+         buf.remote = bswapl(0);
+         buf.xattr.buffersize = bswapl(buf.xattr.buffersize);
+         buf.xattr.flags_rc = bswapl(buf.xattr.flags_rc);
+    }
+
     if(debug)
-      fprintf(stderr,"FAKEROOT: r=%i, received message type=%li, message=%i\n",r,buf.mtype,buf.id);
+      fprintf(stderr,"FAKEROOT: r=%i, received message type=%li, message=%i\n",r,fm.mtype,buf.id);
+
     if(r!=-1) {
       buf.remote = 0;
       process_msg(&buf);
@@ -1521,14 +1566,20 @@ int main(int argc, char **argv){
 # else /* !FAKEROOT_FAKENET */
       close_range(0, num_fds, 0);
 # endif
-#else /* ! HAVE_CLOSE_RANGE */
+      if (errno == ENOSYS) {
+#endif /* HAVE_CLOSE_RANGE */
+
       /* This is the child closing its file descriptors. */
       for (fl= 0; fl <= num_fds; ++fl)
 # ifdef FAKEROOT_FAKENET
 	if (fl != sd)
 # endif /* FAKEROOT_FAKENET */
 	  close(fl);
-#endif
+
+#ifdef HAVE_CLOSE_RANGE
+     }
+#endif /* HAVE_CLOSE_RANGE */
+
       setsid();
     } else {
       printf("%li:%i\n",(long)FAKE_KEY,pid);
