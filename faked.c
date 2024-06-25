@@ -1566,14 +1566,20 @@ int main(int argc, char **argv){
 # else /* !FAKEROOT_FAKENET */
       close_range(0, num_fds, 0);
 # endif
-#else /* ! HAVE_CLOSE_RANGE */
+      if (errno == ENOSYS) {
+#endif /* HAVE_CLOSE_RANGE */
+
       /* This is the child closing its file descriptors. */
       for (fl= 0; fl <= num_fds; ++fl)
 # ifdef FAKEROOT_FAKENET
 	if (fl != sd)
 # endif /* FAKEROOT_FAKENET */
 	  close(fl);
-#endif
+
+#ifdef HAVE_CLOSE_RANGE
+     }
+#endif /* HAVE_CLOSE_RANGE */
+
       setsid();
     } else {
       printf("%li:%i\n",(long)FAKE_KEY,pid);
