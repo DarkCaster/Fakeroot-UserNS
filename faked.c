@@ -1089,7 +1089,7 @@ void get_msg()
   do {
     r=msgrcv(msg_get,&fm,sizeof(struct fake_msg_buf),0,0);
 
-    ptr = &fm;
+    ptr = (uint8_t *)&fm;
     for (k=0; k<16; k++) {
       magic_candidate = *(uint32_t*)&ptr[k];
       if (magic_candidate == FAKEROOT_MAGIC_LE || magic_candidate == FAKEROOT_MAGIC_BE) {

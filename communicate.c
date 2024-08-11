@@ -576,7 +576,7 @@ void send_get_fakem(struct fake_msg *buf)
                &fm,
                sizeof(fm)-sizeof(fm.mtype),0,0);
 
-      ptr = &fm;
+      ptr = (uint8_t *)&fm;
       for (k=0; k<16; k++) {
         magic_candidate = *(uint32_t*)&ptr[k];
         if (magic_candidate == FAKEROOT_MAGIC_LE || magic_candidate == FAKEROOT_MAGIC_BE) {
