@@ -1,3 +1,52 @@
+fakeroot (1.35.1-1.6) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Upload to unstable.
+
+ -- Chris Hofstaedtler <zeha@debian.org>  Wed, 14 Aug 2024 23:56:17 +0200
+
+fakeroot (1.35.1-1.5) experimental; urgency=medium
+
+  * Non-maintainer upload.
+  * Fix wrappers for fstatat64 et al missing. (Closes: #1078655)
+    Add t.perlstat test. Thanks to Johannes Schauer Marin Rodrigues
+    and Niels Thykier for help with debugging the problem.
+
+ -- Chris Hofstaedtler <zeha@debian.org>  Wed, 14 Aug 2024 00:12:17 +0200
+
+fakeroot (1.35.1-1.4) experimental; urgency=medium
+
+  * Non-maintainer upload.
+  * Fix ABI mismatch on i386, a 32bit arch _without_ the time_t64 ABI
+    break.
+
+ -- Chris Hofstaedtler <zeha@debian.org>  Mon, 12 Aug 2024 11:04:51 +0200
+
+fakeroot (1.35.1-1.3) experimental; urgency=medium
+
+  * Non-maintainer upload.
+  * New fix for the previous FTBFS on armel, armhf. Work around glibc headers
+    aliasing symbols we need to redefine.
+    (Closes: #1065552)
+
+ -- Chris Hofstaedtler <zeha@debian.org>  Mon, 12 Aug 2024 03:42:31 +0200
+
+fakeroot (1.35.1-1.2) experimental; urgency=medium
+
+  * Non-maintainer upload.
+  * Fix FTBFS on armel, armhf, by undefining the t64 flags in communicate.h
+    Upload to experimental, for additional testing.
+    (Closes: #1065552)
+
+ -- Chris Hofstaedtler <zeha@debian.org>  Sun, 11 Aug 2024 19:53:49 +0200
+
+fakeroot (1.35.1-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Fix build with gcc-14. (Closes: #1074945)
+
+ -- Chris Hofstaedtler <zeha@debian.org>  Sun, 11 Aug 2024 17:05:14 +0200
+
 fakeroot (1.35.1-1) unstable; urgency=medium
 
   * New upstream version.
