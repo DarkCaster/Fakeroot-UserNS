@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+TMP="$tmp"
+if test ! -d $TMP; then
+  mkdir $TMP
+fi
+cd $TMP
+
+# The new file should be owned by root.
+touch root
+#stat root
+# Perl uses fstat64 (on some platforms). It should see uid 0.
+perl -e '$owner = ((stat("root"))[4]); ($owner == 0) || die("stat failed ($owner)");'
