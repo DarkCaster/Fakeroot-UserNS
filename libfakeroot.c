@@ -38,7 +38,12 @@
    In this file, we want 'struct stat' to have a 32-bit 'ino_t'.
    We use 'struct stat64' when we need a 64-bit 'ino_t'.
 */
-#define _DARWIN_NO_64_BIT_INODE
+# include <sys/types.h>
+# if __DARWIN_ONLY_64_BIT_INO_T
+#  define _DARWIN_USE_64_BIT_INODE
+# else
+#  define _DARWIN_NO_64_BIT_INODE
+# endif
 
 /* The helper _unix2003 version of this file calls a few functions in this file
    that are marked with static_nonapple so that needs to become private instead
@@ -90,6 +95,28 @@
 #define SEND_GET_XATTR64(a,b,c) send_get_xattr64(a,b)
 #endif
 
+#ifndef _STAT_VER
+ #if defined __linux__
+  #if defined (__aarch64__)
+   #define _STAT_VER 0
+  #elif defined (__ia64__)
+   #define _STAT_VER 1
+  #elif defined (__powerpc__) && __WORDSIZE == 64
+   #define _STAT_VER 1
+  #elif defined (__riscv) && __riscv_xlen==64
+   #define _STAT_VER 0
+  #elif defined (__s390x__)
+   #define _STAT_VER 1
+  #elif defined (__x86_64__)
+   #define _STAT_VER 1
+  #else
+   #define _STAT_VER 3
+  #endif
+ #elif defined __GNU__
+   #define _STAT_VER 0
+ #endif
+#endif
+
 /*
    These INT_* (which stands for internal) macros should always be used when
    the fakeroot library owns the storage of the stat variable.
@@ -102,6 +129,7 @@
 #define INT_NEXT_FSTATAT(a,b,c,d) NEXT_FSTATAT64(_STAT_VER,a,b,c,d)
 #define INT_SEND_STAT(a,b) SEND_STAT64(a,b,_STAT_VER)
 #define INT_SEND_GET_XATTR(a,b) SEND_GET_XATTR64(a,b,_STAT_VER)
+#define INT_SEND_GET_STAT(a,b) SEND_GET_STAT64(a,b)
 #else
 #define INT_STRUCT_STAT struct stat
 #define INT_NEXT_STAT(a,b) NEXT_STAT(_STAT_VER,a,b)
@@ -110,8 +138,10 @@
 #define INT_NEXT_FSTATAT(a,b,c,d) NEXT_FSTATAT(_STAT_VER,a,b,c,d)
 #define INT_SEND_STAT(a,b) SEND_STAT(a,b,_STAT_VER)
 #define INT_SEND_GET_XATTR(a,b) SEND_GET_XATTR(a,b,_STAT_VER)
+#define INT_SEND_GET_STAT(a,b) SEND_GET_STAT(a,b)
 #endif
 
+#include <sys/types.h>
 #include <stdlib.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
@@ -123,7 +153,6 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <errno.h>
-#include <sys/types.h>
 #ifdef HAVE_SYS_ACL_H
 #include <sys/acl.h>
 #endif /* HAVE_SYS_ACL_H */
@@ -185,6 +214,15 @@ extern int unsetenv (const char *name);
 #undef __fxstat64
 #undef __lxstat64
 #undef _FILE_OFFSET_BITS
+
+
+#ifndef AT_EMPTY_PATH
+#define AT_EMPTY_PATH 0
+#endif
+
+#ifndef AT_NO_AUTOMOUNT
+#define AT_NO_AUTOMOUNT 0
+#endif
 
 /*
 // next_wrap_st:
@@ -1341,7 +1379,106 @@ int renameat(int olddir_fd, const char *oldpath,
   return 0;
 }
 #endif /* HAVE_RENAMEAT */
+#ifdef HAVE_RENAMEAT2
+int renameat2(int olddir_fd, const char *oldpath,
+              int newdir_fd, const char *newpath, unsigned int flags){
+  int r,s;
+  INT_STRUCT_STAT st;
+
+  /* If newpath points to an existing file, that file will be
+     unlinked.   Make sure we tell the faked daemon about this! */
+
+  /* we need the st_new struct in order to inform faked about the
+     (possible) unlink of the file */
+
+  r=INT_NEXT_FSTATAT(newdir_fd, newpath, &st, AT_SYMLINK_NOFOLLOW);
+
+  s=next_renameat2(olddir_fd, oldpath, newdir_fd, newpath, flags);
+  if(s)
+    return -1;
+  if(!r)
+    INT_SEND_STAT(&st,unlink_func);
+
+  return 0;
+}
+#endif /* HAVE_RENAMEAT2 */
 #endif /* HAVE_FSTATAT */
+
+
+#if defined(__GLIBC__)
+#if __GLIBC_PREREQ(2,33)
+/* Glibc 2.33 exports symbols for these functions in the shared lib */
+
+#ifndef NO_WRAP_LSTAT_SYMBOL
+  /* glibc exports both lstat and __xstat */
+  int lstat(const char *file_name, struct stat *statbuf) {
+     return WRAP_LSTAT LSTAT_ARG(_STAT_VER, file_name, statbuf);
+  }
+#endif
+
+#ifndef NO_WRAP_STAT_SYMBOL
+  /* glibc exports both stat and __xstat */
+  int stat(const char *file_name, struct stat *st) {
+     return WRAP_STAT STAT_ARG(_STAT_VER, file_name, st);
+  }
+#endif
+#ifndef NO_WRAP_FSTAT_SYMBOL
+  /* glibc exports both fstat and __fxstat */
+  int fstat(int fd, struct stat *st) {
+     return WRAP_FSTAT FSTAT_ARG(_STAT_VER, fd, st);
+  }
+#endif
+
+  #if defined(HAVE_FSTATAT) && !defined(NO_WRAP_FSTATAT_SYMBOL)
+    /* glibc exports both fstatat and __fxstatat */
+    int fstatat(int dir_fd, const char *path, struct stat *st, int flags) {
+       return WRAP_FSTATAT FSTATAT_ARG(_STAT_VER, dir_fd, path, st, flags);
+    }
+  #endif
+
+  #ifdef STAT64_SUPPORT
+    #ifndef NO_WRAP_LSTAT64_SYMBOL
+    /* glibc exports both lstat64 and __xstat64 */
+    int lstat64(const char *file_name, struct stat64 *st) {
+       return WRAP_LSTAT64 LSTAT64_ARG(_STAT_VER, file_name, st);
+    }
+    #endif
+    #ifndef NO_WRAP_STAT64_SYMBOL
+    /* glibc exports both stat64 and __xstat64 */
+    int stat64(const char *file_name, struct stat64 *st) {
+       return WRAP_STAT64 STAT64_ARG(_STAT_VER, file_name, st);
+    }
+    #endif
+    #ifndef NO_WRAP_FSTAT64_SYMBOL
+    /* glibc exports both fstat64 and __fxstat64 */
+    int fstat64(int fd, struct stat64 *st) {
+       return WRAP_FSTAT64 FSTAT64_ARG(_STAT_VER, fd, st);
+    }
+    #endif
+
+    #if defined(HAVE_FSTATAT) && !defined(NO_WRAP_FSTATAT64_SYMBOL)
+    /* glibc exports both fstatat64 and __fxstatat64 */
+      int fstatat64(int dir_fd, const char *path, struct stat64 *st, int flags) {
+	 return WRAP_FSTATAT64 FSTATAT64_ARG(_STAT_VER, dir_fd, path, st, flags);
+      }
+    #endif
+  #endif
+
+  #ifndef NO_WRAP_MKNOD_SYMBOL
+  /* glibc exports both mknod and __xmknod */
+  int mknod(const char *pathname, mode_t mode, dev_t dev) {
+     return WRAP_MKNOD MKNOD_ARG(_STAT_VER, pathname, mode, &dev);
+  }
+  #endif
+
+  #if defined(HAVE_FSTATAT) && defined(HAVE_MKNODAT) && !defined(NO_WRAP_MKNODAT_SYMBOL)
+  /* glibc exports both mknodat and __xmknodat */
+    int mknodat(int dir_fd, const char *pathname, mode_t mode, dev_t dev) {
+       return WRAP_MKNODAT MKNODAT_ARG(_STAT_VER, dir_fd, pathname, mode, &dev);
+    }
+  #endif
+#endif /* __GLIBC__ */
+#endif /* GLIBC_PREREQ */
 
 
 #ifdef FAKEROOT_FAKENET
@@ -1913,7 +2050,7 @@ ssize_t fremovexattr(int fd, const char *name)
 }
 #endif /* HAVE_FREMOVEXATTR */
 
-int setpriority(int which, int who, int prio){
+int setpriority(int which, id_t who, int prio){
   if (fakeroot_disabled)
     return next_setpriority(which, who, prio);
   next_setpriority(which, who, prio);
@@ -2010,11 +2147,7 @@ FTSENT *fts_read(FTS *ftsp) {
             || r->fts_info == FTS_NS || r->fts_info == FTS_NSOK))
     r->fts_statp = NULL;  /* Otherwise fts_statp may be a random pointer */
   if(r && r->fts_statp) {  /* Should we bother checking fts_info here? */
-# if defined(STAT64_SUPPORT) && !defined(__APPLE__)
-    SEND_GET_STAT64(r->fts_statp, _STAT_VER);
-# else
     SEND_GET_STAT(r->fts_statp, _STAT_VER);
-# endif
   }
 
   return r;
@@ -2033,11 +2166,7 @@ FTSENT *fts_children(FTS *ftsp, int options) {
   first=next_fts_children(ftsp, options);
   for(r = first; r; r = r->fts_link) {
     if(r && r->fts_statp) {  /* Should we bother checking fts_info here? */
-# if defined(STAT64_SUPPORT) && !defined(__APPLE__)
-      SEND_GET_STAT64(r->fts_statp, _STAT_VER);
-# else
       SEND_GET_STAT(r->fts_statp, _STAT_VER);
-# endif
     }
   }
 
@@ -2469,13 +2598,13 @@ int statx (int dirfd, const char *path, int flags, unsigned int mask, struct sta
 
 #ifdef LIBFAKEROOT_DEBUGGING
   if (fakeroot_debug) {
-    fprintf(stderr, "statx fd %d\n", fd);
+    fprintf(stderr, "statx fd %d\n", dirfd);
   }
 #endif /* LIBFAKEROOT_DEBUGGING */
   r=INT_NEXT_FSTATAT(dirfd, path, &st, flags);
   if(r)
     return -1;
-  SEND_GET_STAT(&st,ver);
+  INT_SEND_GET_STAT(&st,ver);
 
   r=next_statx(dirfd, path, flags, mask, buf);
   if(r)

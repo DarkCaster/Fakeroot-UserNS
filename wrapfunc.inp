@@ -9,8 +9,10 @@
 /**/									  */
 /* each line of this file lists 4 fields, seperated by a ";".		  */
 /* The first field is the name of the wrapped function, then it's return  */
-/* value. After that come the function arguments with types, and the last */
+/* value. After that come the function arguments with types, and the fifth */
 /* field contains the function arguments without types.                   */
+/* A sixth field is a special needed when wrapping the openat syscall.    */
+/* Otherwise it's like the third (function arguments with types).         */
 /**/
 
 /* __*xstat are used on glibc systems instead of just *xstat. */
@@ -48,6 +50,7 @@ getattrlist$UNIX2003;int;(const char *path, void *attrList, void *attrBuf, size_
 #endif
 #endif
 #if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5
+#include <spawn.h>
 lstat$INODE64;int;(const char *file_name, struct stat *buf);(file_name, buf)
 stat$INODE64;int;(const char *file_name, struct stat *buf);(file_name, buf)
 fstat$INODE64;int;(int fd, struct stat *buf);(fd, buf)
@@ -146,7 +149,7 @@ setfsgid;gid_t;(gid_t fsgid);(fsgid)
 initgroups;int;(const char *user, INITGROUPS_SECOND_ARG group);(user, group)
 getgroups;int;(int size, gid_t list[]);(size, list)
 setgroups;int;(SETGROUPS_SIZE_TYPE size, const gid_t *list);(size, list)
-setpriority;int;(int which, int who, int prio);(which, who, prio)
+setpriority;int;(int which, id_t who, int prio);(which, who, prio)
 #ifdef HAVE_CAPSET
 capset;int;(cap_user_header_t hdrp, const cap_user_data_t datap);(hdrp, datap)
 #endif /* HAVE_CAPSET */
@@ -197,12 +200,12 @@ fchownat;int;(int dir_fd, const char *path, uid_t owner, gid_t group, int flags)
 #ifdef HAVE_MKDIRAT
 mkdirat;int;(int dir_fd, const char *pathname, mode_t mode);(dir_fd, pathname, mode)
 #endif /* HAVE_MKDIRAT */
-#ifdef HAVE_OPENAT
-openat;int;(int dir_fd, const char *pathname, int flags);(dir_fd, pathname, flags)
-#endif /* HAVE_OPENAT */
 #ifdef HAVE_RENAMEAT
 renameat;int;(int olddir_fd, const char *oldpath, int newdir_fd, const char *newpath);(olddir_fd, oldpath, newdir_fd, newpath)
 #endif /* HAVE_RENAMEAT */
+#ifdef HAVE_RENAMEAT2
+renameat2;int;(int olddir_fd, const char *oldpath, int newdir_fd, const char *newpath, unsigned int flags);(olddir_fd, oldpath, newdir_fd, newpath, flags)
+#endif /* HAVE_RENAMEAT2 */
 #ifdef HAVE_UNLINKAT
 unlinkat;int;(int dir_fd, const char *pathname, int flags);(dir_fd, pathname, flags)
 #endif /* HAVE_UNLINKAT */
@@ -253,3 +256,10 @@ statx;int;(int dir_fd, const char *pathname, int flags, unsigned int mask, struc
 #ifdef __sun
 sysinfo;int;(int command, char *buf, long count);(command, buf, count)
 #endif
+
+#ifdef TIME64_HACK
+WRAP_LSTAT64_TIME64;int;LSTAT64_TIME64_ARG(int ver, const char *file_name, struct stat64 *buf);LSTAT64_TIME64_ARG(ver, file_name, buf);LSTAT64_TIME64
+WRAP_STAT64_TIME64;int;STAT64_TIME64_ARG(int ver, const char *file_name, struct stat64 *buf);STAT64_TIME64_ARG(ver, file_name, buf);STAT64_TIME64
+WRAP_FSTAT64_TIME64;int;FSTAT64_TIME64_ARG(int ver, int fd, struct stat64 *buf);FSTAT64_TIME64_ARG(ver, fd, buf);FSTAT64_TIME64
+WRAP_FSTATAT64_TIME64;int;FSTATAT64_TIME64_ARG(int ver, int dir_fd, const char *path, struct stat64 *buf, int flags);FSTATAT64_TIME64_ARG(ver, dir_fd, path, buf, flags);FSTATAT64_TIME64
+#endif /* TIME64_HACK */

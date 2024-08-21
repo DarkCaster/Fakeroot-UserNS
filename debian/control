@@ -1,16 +1,23 @@
 Source: sandboxer-fakeroot
 Section: utils
 Priority: optional
-Build-Depends: build-essential, quilt, debhelper (>= 9), dh-autoreconf, libacl1-dev, libcap-dev [linux-any], libcap2-bin [linux-any]
+Build-Depends: build-essential,
+               quilt,
+               debhelper (>= 9),
+               dh-autoreconf,
+               libacl1-dev,
+               libcap-dev [linux-any],
+               libcap2-bin [linux-any],
+               po4a <!nodoc>,
+               sharutils <!nocheck>
 Maintainer: DarkCaster <dark.caster@outlook.com>
-Standards-Version: 4.1.4
+Standards-Version: 4.7.0
 Homepage: https://github.com/DarkCaster/Fakeroot-UserNS
-
 Package: sandboxer-fakeroot
 Architecture: any
 Multi-Arch: foreign
 Depends: ${misc:Depends}, ${shlibs:Depends}
-Description: tool for simulating superuser privileges
+Description: tool for simulating superuser privileges - shared libraries
  fakeroot provides a fake "root environment" by means of LD_PRELOAD and
  SysV IPC (or TCP) trickery. It puts wrappers around getuid(), chown(),
  stat(), and other file-manipulation functions, so that unprivileged
