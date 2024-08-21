@@ -1527,7 +1527,6 @@ int main(int argc, char **argv){
 
   for(i=1; i< NSIG; i++){
     switch (i){
-    case SIGWINCH:
     case SIGUSR1:
       /* this is strictly a debugging feature, unless someone can confirm
          that save will always get a consistent database */
